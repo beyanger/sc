@@ -4,7 +4,7 @@
 
 PWD := $(shell pwd)
 
-KERNEL_DIR := /usr/src/kernels/$(shell uname -r)
+KERNEL_DIR := /usr/src/linux-headers-$(shell uname -r)
 
 obj-m := snull.o
 
