@@ -423,7 +423,6 @@ int snull_change_mtu(struct net_device *dev, int new_mtu) {
 static struct header_ops header_devops =  
 {  
 	.create = snull_header,  
-	.rebuild  = snull_rebuild_header,  
 };  
 
 
@@ -474,11 +473,12 @@ void snull_module_cleanup(void) {
 
 int  snull_module_init(void) {
 	int result, i, ret = -ENOMEM;
+	char name[128];
 	snull_interrupt = snull_regular_interrupt;
 	for (i = 0; i < 2; i++) {
-		char s[32];
-		snprintf(s, sizeof(s), "sn%d", i);
-		snull_devs[i] = alloc_netdev(sizeof(struct snull_priv), s, snull_init);
+		snprintf(name, sizeof(name), "snull%d", i);
+
+		snull_devs[i] = alloc_netdev(sizeof(struct snull_priv), name, (char)i, snull_init);
 	}
 
 	if (snull_devs[0] == NULL || snull_devs[1] == NULL) 
