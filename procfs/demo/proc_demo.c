@@ -25,7 +25,7 @@ static ssize_t proc_demo_write(struct file *filp, const char __user *buf, size_t
 	return size;
 }
 
-struct file_operations proc_fops = {
+static struct file_operations proc_fops = {
 	.owner = THIS_MODULE,
 	.open = proc_demo_open,
 	.write = proc_demo_write,
