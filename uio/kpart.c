@@ -10,7 +10,6 @@
 
 static struct timer_list tm;
 
-
 struct uio_info kpart_info  = {
 	.name = "kpart",
 	.version = "0.1",
@@ -51,7 +50,6 @@ drv_kpart_probe(struct device *dev)
 		return -ENODEV;
 	}
 
-
 	init_timer(&tm);
 	tm.function = call_back;
 	tm.data = (unsigned long)mem;
@@ -82,9 +80,6 @@ static struct platform_device *uio_dummy_device;
 static int __init
 uio_kpart_init(void) 
 {
-
-	
-
 	uio_dummy_device = platform_device_register_simple("kpart", -1, NULL, 0);
 	return driver_register(&uio_dummy_driver);
 }

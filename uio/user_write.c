@@ -7,10 +7,16 @@
 #include <errno.h>
 
 
+#if 0
 #define UIO_DEV		"/dev/uio0"
 #define UIO_ADDR	"/sys/class/uio/uio0/maps/map0/addr"
 #define UIO_SIZE	"/sys/class/uio/uio0/maps/map0/size"
+#endif
 
+
+static char UIO_DEV[32];
+static char UIO_ADDR[128];
+static char UIO_SIZE[128];
 
 
 int main(int argc, char **argv) {
@@ -19,6 +25,10 @@ int main(int argc, char **argv) {
 	char *uio_addr, *access_addr;
 	char addr_buf[128], size_buf[128];
 
+
+	snprintf(UIO_DEV, sizeof(UIO_DEV), "/dev/uio%s", argv[1]);
+	snprintf(UIO_ADDR, sizeof(UIO_ADDR), "/sys/class/uio/uio%s/maps/map0/addr", argv[1]);
+	snprintf(UIO_SIZE, sizeof(UIO_SIZE), "/sys/class/uio/uio%s/maps/map0/size", argv[1]);
 
 	uio_fd = open(UIO_DEV, O_RDWR);
 	addr_fd = open(UIO_ADDR, O_RDONLY);
@@ -37,7 +47,6 @@ int main(int argc, char **argv) {
 
 
 	printf("uio at: %p, size: %lu\n", uio_addr, uio_size);
-
 
 	access_addr = mmap(NULL, uio_size, PROT_READ|PROT_WRITE, MAP_SHARED, uio_fd, 0);
 
