@@ -1,5 +1,4 @@
 
-
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/types.h>
@@ -29,20 +28,20 @@ static int dev_close(struct inode *inode, struct file *filp)
 
 static int dev_mmap(struct file *filp, struct vm_area_struct *vma)
 {
+	int ret;
+
 	printk("device mmap\n");
 	vma->vm_flags |= VM_IO;
 	vma->vm_flags |= (VM_DONTEXPAND|VM_DONTDUMP);
-
 
 	printk("virt_to_phys: %llx\n", virt_to_phys(buffer));
 	printk("PAGE_SHIFT: %d\n", PAGE_SHIFT);
 	printk("end: %lx, start: %lx\n", vma->vm_end, vma->vm_start);
 
-
-	if (remap_pfn_range(vma, vma->vm_start, virt_to_phys(buffer)>>PAGE_SHIFT,
-				vma->vm_end-vma->vm_start, vma->vm_page_prot)) {
+	ret = remap_pfn_range(vma, vma->vm_start, virt_to_phys(buffer)>>PAGE_SHIFT,
+				vma->vm_end-vma->vm_start, vma->vm_page_prot);
+	if (ret) 
 		return -EAGAIN;
-	}
 	return 0;
 }
 
@@ -69,7 +68,6 @@ static int __init dev_mmap_init(void)
 	printk("%s misc dev init %s\n", MISC_NAME, ret==0 ? "successed" : "failed");
 	return ret;
 }
-
 
 static void __exit dev_mmap_exit(void)
 {
