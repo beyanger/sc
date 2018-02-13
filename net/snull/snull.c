@@ -72,7 +72,7 @@ static void snull_tx_timeout(struct net_device *dev);
 static void (*snull_interrupt)(int, void *, struct pt_regs *);
 
 
-void snull_setup_pool(struct net_device *dev) {
+static void snull_setup_pool(struct net_device *dev) {
 	struct snull_priv *priv = netdev_priv(dev);
 	int i;
 	struct snull_packet *pkt;
@@ -90,7 +90,7 @@ void snull_setup_pool(struct net_device *dev) {
 }
 
 
-void snull_teardown_pool(struct net_device *dev) {
+static void snull_teardown_pool(struct net_device *dev) {
 	struct snull_priv *priv = netdev_priv(dev);
 	struct snull_packet *pkt;
 
@@ -100,7 +100,7 @@ void snull_teardown_pool(struct net_device *dev) {
 	}
 }
 
-struct snull_packet *snull_get_tx_buffer(struct net_device *dev) {
+static struct snull_packet *snull_get_tx_buffer(struct net_device *dev) {
 	struct snull_priv *priv = netdev_priv(dev);
 	unsigned long flags;
 	struct snull_packet *pkt;
@@ -117,7 +117,7 @@ struct snull_packet *snull_get_tx_buffer(struct net_device *dev) {
 	return pkt;  
 }
 
-void snull_release_buffer(struct snull_packet *pkt)  
+static void snull_release_buffer(struct snull_packet *pkt)  
 {  
 	unsigned long flags;  
 	struct snull_priv *priv = netdev_priv(pkt->dev);  
@@ -130,7 +130,7 @@ void snull_release_buffer(struct snull_packet *pkt)
 		netif_wake_queue(pkt->dev);  
 }  
 
-void snull_enqueue_buf(struct net_device *dev, struct snull_packet *pkt)  
+static void snull_enqueue_buf(struct net_device *dev, struct snull_packet *pkt)  
 {  
 	unsigned long flags;  
 	struct snull_priv *priv = netdev_priv(dev);  
@@ -141,7 +141,7 @@ void snull_enqueue_buf(struct net_device *dev, struct snull_packet *pkt)
 	spin_unlock_irqrestore(&priv->lock, flags);  
 }  
 
-struct snull_packet *snull_dequeue_buf(struct net_device *dev)  
+static struct snull_packet *snull_dequeue_buf(struct net_device *dev)  
 {  
 	struct snull_priv *priv = netdev_priv(dev);  
 	struct snull_packet *pkt;  
@@ -155,21 +155,15 @@ struct snull_packet *snull_dequeue_buf(struct net_device *dev)
 	return pkt;  
 }  
 
-
-
-
-
 static void snull_rx_ints(struct net_device *dev, int enable)  
 {  
 	struct snull_priv *priv = netdev_priv(dev);  
 	priv->rx_int_enabled = enable;  
 }  
 
-struct net_device *snull_devs[2];
+static struct net_device *snull_devs[2];
 
-
-
-int snull_open(struct net_device *dev) {
+static int snull_open(struct net_device *dev) {
 
 	memcpy(dev->dev_addr, "\0SNUL0", ETH_ALEN);
 	if (dev == snull_devs[1]) 
@@ -179,14 +173,12 @@ int snull_open(struct net_device *dev) {
 	return 0;
 }
 
-
-
-int snull_release(struct net_device *dev) {
+static int snull_release(struct net_device *dev) {
 	netif_stop_queue(dev);
 	return 0;
 }
 
-int snull_config(struct net_device *dev, struct ifmap *map) {
+static int snull_config(struct net_device *dev, struct ifmap *map) {
 	if (dev->flags & IFF_UP) /* can't act on a running interface */  
 		return -EBUSY;  
 
@@ -206,10 +198,7 @@ int snull_config(struct net_device *dev, struct ifmap *map) {
 	return 0;  
 }
 
-
-
-
-void snull_rx(struct net_device *dev, struct snull_packet *pkt) {
+static void snull_rx(struct net_device *dev, struct snull_packet *pkt) {
 	struct sk_buff *skb;
 	struct snull_priv *priv = netdev_priv(dev);
 
@@ -231,10 +220,6 @@ void snull_rx(struct net_device *dev, struct snull_packet *pkt) {
 	priv->stats.rx_bytes += pkt->datalen;
 	netif_rx(skb);
 }
-
-
-
-
 
 static void snull_regular_interrupt(int irq, void *dev_id, struct pt_regs *regs)  
 {  
@@ -280,8 +265,6 @@ static void snull_regular_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 	if (pkt) snull_release_buffer(pkt); /* Do this outside the lock! */  
 	return;  
 }  
-
-
 
 static void snull_hw_tx(char *buf, int len, struct net_device *dev) {
 	struct iphdr *ih;
@@ -337,7 +320,7 @@ static void snull_hw_tx(char *buf, int len, struct net_device *dev) {
 	}  
 }
 
-int snull_tx(struct sk_buff *skb, struct net_device *dev) {
+static int snull_tx(struct sk_buff *skb, struct net_device *dev) {
 	int len;
 	char *data, shortpkt[ETH_ZLEN];
 
@@ -358,7 +341,7 @@ int snull_tx(struct sk_buff *skb, struct net_device *dev) {
 }
 
 
-void snull_tx_timeout(struct net_device *dev) {
+static void snull_tx_timeout(struct net_device *dev) {
 	struct snull_priv *priv = netdev_priv(dev);
 
 	priv->status = SNULL_TX_INTR;
@@ -368,19 +351,17 @@ void snull_tx_timeout(struct net_device *dev) {
 }
 
 
-int snull_ioctl(struct net_device *dev, struct ifreq *rq, int cmd) {
+static int snull_ioctl(struct net_device *dev, struct ifreq *rq, int cmd) {
 	return 0;
 }
 
 
-struct net_device_stats *snull_stats(struct net_device *dev) {
+static struct net_device_stats *snull_stats(struct net_device *dev) {
 	struct snull_priv *priv = netdev_priv(dev);
 	return &priv->stats;
 }
 
-
-
-int snull_rebuild_header(struct sk_buff *skb) {
+static int snull_rebuild_header(struct sk_buff *skb) {
 	struct ethhdr *eth = (struct ethhdr *)skb->data;
 	struct net_device *dev = skb->dev;
 
@@ -391,7 +372,7 @@ int snull_rebuild_header(struct sk_buff *skb) {
 }
 
 
-int snull_header(struct sk_buff *skb, struct net_device *dev, 
+static int snull_header(struct sk_buff *skb, struct net_device *dev, 
 		unsigned short type, const void *daddr,
 		const void *saddr, unsigned len) {
 	struct ethhdr *eth = (struct ethhdr *)skb_push(skb, ETH_HLEN);
@@ -403,7 +384,7 @@ int snull_header(struct sk_buff *skb, struct net_device *dev,
 }
 
 
-int snull_change_mtu(struct net_device *dev, int new_mtu) {
+static int snull_change_mtu(struct net_device *dev, int new_mtu) {
 	unsigned long flags;  
 	struct snull_priv *priv = netdev_priv(dev);  
 	spinlock_t *lock = &priv->lock;  
@@ -439,7 +420,7 @@ static struct net_device_ops net_devops =
 };  
 
 
-void snull_init(struct net_device *dev) {
+static void snull_init(struct net_device *dev) {
 	struct snull_priv *priv;
 
 	ether_setup(dev);
@@ -459,7 +440,7 @@ void snull_init(struct net_device *dev) {
 	snull_setup_pool(dev);
 }
 
-void snull_module_cleanup(void) {
+static void snull_module_cleanup(void) {
 	int i;
 	for (i = 0; i < 2; i++) {
 		if (snull_devs[i]) {
@@ -471,7 +452,7 @@ void snull_module_cleanup(void) {
 }
 
 
-int  snull_module_init(void) {
+static int snull_module_init(void) {
 	int result, i, ret = -ENOMEM;
 	char name[128];
 	snull_interrupt = snull_regular_interrupt;
@@ -493,14 +474,11 @@ int  snull_module_init(void) {
 			ret = 0;
 	}
 
-
-
 out:
 	if (ret)
 		snull_module_cleanup();
 	return ret;
 }
-
 
 
 module_init(snull_module_init);

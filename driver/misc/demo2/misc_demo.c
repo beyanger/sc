@@ -16,7 +16,7 @@ module_param(count, int, S_IRUGO);
 
 static struct miscdevice **misc;
 
-char *strdup(char *str)
+static char *strdup(char *str)
 {
 	int n = strlen(str) + 1;
 	char *s = kmalloc(n, GFP_KERNEL);
@@ -96,7 +96,5 @@ module_exit(misc_demo_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Yang");
-
-
 
 
